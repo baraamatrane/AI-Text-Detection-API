@@ -1,19 +1,24 @@
 from fastapi import FastAPI
+from database import engine, Base
+from fastapi.middleware.cors import CORSMiddleware
+
+from routers.DetectRoute import Detectroute
+from routers.userRoute import UserRouter
+from routers.humanizeRoute import HumanizeRouter
 
 app = FastAPI(title="Huminize API",  version="1.0.0")
-
-products = [
-    {"id": 1, "name": "Laptop", "price": 999.99},
-    {"id": 2, "name": "Smartphone", "price": 499.99},
-    {"id": 3, "name": "Tablet", "price": 299.99},
-]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def main():
     return {"response":"HI There! "}
 
-@app.get("/products")
-async def Products(name: str = None):
-    if name:
-        return [product for product in products if product["name"] == name]
-    return products
+app.include_router(UserRouter)
+app.include_router(HumanizeRouter)
+app.include_router(Detectroute)
